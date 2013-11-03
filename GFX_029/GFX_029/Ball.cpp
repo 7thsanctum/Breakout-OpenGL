@@ -2,7 +2,7 @@
 
 Ball::Ball() 
 {
-	speed = 12.0f;
+	speed = 8.0f;
 }
 
 Ball::~Ball() { }
@@ -36,7 +36,7 @@ void Ball::Update(float deltaTime)
 
 void Ball::MoveBall(float deltaTime)
 {
-	renderObj.transform.position -= GetDirection() * glm::vec3(deltaTime, deltaTime, 0.0f);
+	renderObj.transform.position -= GetDirection() * glm::vec3(speed * deltaTime, speed * deltaTime, 0.0f);
 }
 
 glm::vec3 Ball::RandomDirection()

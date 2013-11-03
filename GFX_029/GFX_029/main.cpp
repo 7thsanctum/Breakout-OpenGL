@@ -15,9 +15,12 @@
 #include <vector>
 #include <random>
 #include <iostream>
-#include "Ball.h"
 #include "geometry.h"
 #include "shader.h"
+
+#include "GameObject.h"
+#include "Ball.h"
+#include "Brick.h"
 
 using namespace std;
 using namespace glm;
@@ -26,7 +29,7 @@ GLuint shaders[2];  // Declare 2 shaders
 GLuint program;		// Declare one program paddle
 GLint colourUniform;
 
-vector< vector<render_object> > brick;
+vector< vector<Brick> > brick;
 Ball ball;				// Declare render_object for geometry
 render_object paddle;	// Declare render_object for geometry
 
@@ -39,6 +42,7 @@ bool running = true;
 
 void initialise()
 {
+	// TODO: add in resolution selection code from other project
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	mat4 projection = perspective(degrees(quarter_pi<float>()), 
 		                                                 800.0f/600.0f, 
@@ -62,19 +66,25 @@ void initialise()
 
 	colourUniform = glGetUniformLocation(program, "colour");
 	geometry* geom = createQuad();			// Create a quad to add to all the objects in the scene
+	render_object temp;	
+
 	for(int i = 0; i < rows; ++i)	// Each line
 	{
-		vector<render_object> temp;
+		vector<Brick> tempB;
 		for(int j = 0; j < columns; ++j)			// Each individual brick
 		{
-			render_object b;
-			b.geometry = geom;
-			b.transform.position = vec3(-4.0f + (j*1.1f), 3.0f - i*0.8f, 0.0f);
-			b.transform.scale = vec3(0.5f, 0.30f, 0.0f);
-			b.colour = vec4(i - 2, i - 1, i + 1 , 1.0f);
-			temp.push_back(b);
+			Brick b;
+			temp.geometry = geom;
+			temp.transform.position = vec3(-4.0f + (j*1.1f), 3.0f - i*0.8f, 0.0f);
+			temp.transform.scale = vec3(0.6f, 0.30f, 0.0f);
+			temp.colour = vec4(i - 2, i - 1, i + 1 , 1.0f);
+			b.SetRenderObject(temp);
+			if(i % 2 == 0) b.SetHealth(1);
+			else b.SetHealth(2);
+			b.UpdateColour();
+			tempB.push_back(b);
 		}
-		brick.push_back(temp);
+		brick.push_back(tempB);
 	}
 
 	paddle.geometry = geom;
@@ -84,7 +94,7 @@ void initialise()
 	paddle.colour = vec4(0.0f, 1.0f, 0.0f, 1.0f);  // Set colour 
 
 	geom = createSphere(20,20);
-	render_object temp;	
+	
 	temp.geometry = geom;
 	temp.transform.scale = vec3(0.1f, 0.1f, 0.1f);
 	temp.transform.position -= vec3(0.0f, 2.5f, 0.0f);
@@ -117,14 +127,67 @@ void update (double deltaTime)
 	else if(ball.renderObj.transform.position.x < -horizontalLimit) 
 		ball.Bounce();
 	if(ball.renderObj.transform.position.y > horizontalLimit)
-		ball.SetDirection(glm::vec3(ball.GetDirection().y) *= -1.0f);
+	{
+		glm::vec3 temp = glm::vec3(ball.GetDirection());
+		temp.y *= -1.0f;
+		ball.SetDirection(temp);
+	}
 	else if(ball.renderObj.transform.position.y < -horizontalLimit + 1.0f) 
 		ball.ResetBall();
 
-	if((ball.renderObj.transform.position.y <= paddle.transform.position.y + 0.1f && ball.renderObj.transform.position.y >= paddle.transform.position.y - 0.1f) && 
-		(ball.renderObj.transform.position.x >= paddle.transform.position.x - 0.2f && ball.renderObj.transform.position.x <= paddle.transform.position.x + 0.2f))
+	// TODO: move this collision and bounding box stuff into a better place
+	// Check collisions with bricks
+	for(vector<Brick> r : brick)	// Each line	
+		for(Brick b : r)			// Each individual brick
+		{
+			if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= b.renderObj.transform.position.y + b.renderObj.transform.scale.y 
+				&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= b.renderObj.transform.position.y - b.renderObj.transform.scale.y) 
+			&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= b.renderObj.transform.position.x - b.renderObj.transform.scale.x 
+				&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= b.renderObj.transform.position.x + b.renderObj.transform.scale.x))
+			{
+				// There was a collision with this brick
+				b.DeductHealth(1);
+				if(b.GetHealth() == 2)
+					b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+				else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+				// calculate which way to deflect the ball
+				glm::vec3 temp = glm::vec3(ball.GetDirection());
+				if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < b.renderObj.transform.position.x + b.renderObj.transform.scale.x 
+					&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x > b.renderObj.transform.position.x - b.renderObj.transform.scale.y )
+				{					
+					temp.y *= -1.0f;
+					ball.SetDirection(temp);
+				}
+				else
+				{
+					temp.x *= -1.0f;
+					ball.SetDirection(temp);
+				}
+				//ball.direction.x *= -1.0f;
+				//ball.Update(deltaTime);
+			}
+		}
+
+	// Check collision with paddle
+	if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= paddle.transform.position.y + paddle.transform.scale.y 
+		&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= paddle.transform.position.y - paddle.transform.scale.y) 
+	&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= paddle.transform.position.x - paddle.transform.scale.x 
+		&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= paddle.transform.position.x + paddle.transform.scale.x))
 	{
-		ball.SetDirection(glm::vec3(ball.GetDirection().y) *= -1.0f);
+		glm::vec3 temp = glm::vec3(ball.GetDirection());
+		if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < paddle.transform.position.x + paddle.transform.scale.x 
+			&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x < paddle.transform.position.x - paddle.transform.scale.x)
+		{					
+			temp.x *= -1.0f;
+			ball.SetDirection(temp);
+		}
+		else
+		{
+			temp.y *= -1.0f;
+			ball.SetDirection(temp);
+		}
+
+		//ball.SetDirection(glm::vec3(ball.GetDirection().y) *= -1.0f);
 		//ball.direction.x *= -1.0f;
 	}
 
@@ -138,12 +201,12 @@ void render()
 								 vec3(0.0f, 0.0f, 0.0f),
 								 vec3(0.0f, 1.0f, 0.0f));
 	glMatrixMode(GL_MODELVIEW);
-	glUseProgram(program);  //Use program we created
-	for(vector<render_object> r : brick)	// Each line	
-		for(render_object b : r)			// Each individual brick
+	glUseProgram(program);			//Use program we created
+	for(vector<Brick> r : brick)	// Each line	
+		for(Brick b : r)			// Each individual brick
 		{
-			glUniform4fv(colourUniform, 1, value_ptr(b.colour));
-			b.render(view);
+			glUniform4fv(colourUniform, 1, value_ptr(b.renderObj.colour));
+			b.renderObj.render(view);
 		}
 		glUniform4fv(colourUniform, 1, value_ptr(ball.renderObj.colour));	
 	ball.renderObj.render(view);	// Call render as before

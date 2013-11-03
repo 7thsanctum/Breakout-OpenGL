@@ -1,3 +1,5 @@
+#pragma once
+
 #include <GL\glfw.h>
 #include <glm\glm.hpp>
 #include <glm\gtc\type_ptr.hpp>  //For mat4_cast
