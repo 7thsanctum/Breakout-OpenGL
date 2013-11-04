@@ -3,10 +3,10 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Users\Mark\Documents\Libraries\glut-3.7\include;C:\Users\Mark\Documents\Libraries\SDL-1.2.15\include;C:\Users\Mark\Documents\Libraries\DevIL-SDK-x86-1.7.8\include;C:\Users\Mark\Documents\Libraries\boost_1_51;C:\Users\Mark\Documents\Libraries\glew-1.9.0\include;C:\Users\Mark\Documents\Libraries\glm-0.9.3.4;C:\Users\Mark\Documents\Libraries\glfw-2.7.6.bin.WIN32\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\10006179\Desktop\Libraries\glut-3.7\include;C:\Users\10006179\Desktop\Libraries\SDL-1.2.15\include;C:\Users\10006179\Desktop\Libraries\DevIL-SDK-x86-1.7.8\include;C:\Users\10006179\Desktop\Libraries\boost_1_51;C:\Users\10006179\Desktop\Libraries\glew-1.9.0\include;C:\Users\10006179\Desktop\Libraries\glm-0.9.3.4;C:\Users\10006179\Desktop\Libraries\glfw-2.7.6.bin.WIN32\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup>
-    <LibraryPath>C:\Users\Mark\Documents\Libraries\glut-3.7\lib;C:\Users\Mark\Documents\Libraries\SDL-1.2.15\lib\x86;C:\Users\Mark\Documents\Libraries\DevIL-SDK-x86-1.7.8\lib;C:\Users\Mark\Documents\Libraries\boost_1_51\libs;C:\Users\Mark\Documents\Libraries\glew-1.9.0\lib;C:\Users\Mark\Documents\Libraries\glfw-2.7.6.bin.WIN32\lib-msvc100;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\10006179\Desktop\Libraries\glut-3.7\lib;C:\Users\10006179\Desktop\Libraries\SDL-1.2.15\lib\x86;C:\Users\Mark\Documents\Libraries\DevIL-SDK-x86-1.7.8\lib;C:\Users\Mark\Documents\Libraries\boost_1_51\libs;C:\Users\10006179\Desktop\Libraries\glew-1.9.0\lib;C:\Users\10006179\Desktop\Libraries\glfw-2.7.6.bin.WIN32\lib-msvc100;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />

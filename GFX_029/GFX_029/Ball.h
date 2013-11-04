@@ -11,7 +11,6 @@ public:
 	using GameObject::GameObject;
 	Ball();
 	~Ball();
-	void SetDirection(glm::vec3 dir);
 	void StartBall(glm::vec3 paddlePos);
 	void ResetBall();
 	void Update(float deltaTime);
@@ -19,8 +18,6 @@ public:
 	void Bounce();
 	glm::vec3 RandomDirection();
 	void checkCollision();
-	glm::vec3 GetDirection();
 private:
-	glm::vec3 direction;
 	float speed;
 };

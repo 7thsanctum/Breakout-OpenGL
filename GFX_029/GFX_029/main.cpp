@@ -19,6 +19,7 @@
 #include "shader.h"
 
 #include "GameObject.h"
+#include "Paddle.h"
 #include "Ball.h"
 #include "Brick.h"
 
@@ -31,7 +32,7 @@ GLint colourUniform;
 
 vector< vector<Brick> > brick;
 Ball ball;				// Declare render_object for geometry
-render_object paddle;	// Declare render_object for geometry
+Paddle paddle;	// Declare render_object for geometry
 
 float horizontalLimit = 5.0f;
 float paddleSpeed = 8.0f;
@@ -87,11 +88,11 @@ void initialise()
 		brick.push_back(tempB);
 	}
 
-	paddle.geometry = geom;
-	paddle.transform.position -= vec3(0.0f, 3.0f, 0.0f);
-	paddle.transform.scale.y = 0.1f;
-	paddle.transform.scale.x = 1.0f;
-	paddle.colour = vec4(0.0f, 1.0f, 0.0f, 1.0f);  // Set colour 
+	paddle.renderObj.geometry = geom;
+	paddle.renderObj.transform.position -= vec3(0.0f, 3.0f, 0.0f);
+	paddle.renderObj.transform.scale.y = 0.1f;
+	paddle.renderObj.transform.scale.x = 1.0f;
+	paddle.renderObj.colour = vec4(0.0f, 1.0f, 0.0f, 1.0f);  // Set colour 
 
 	geom = createSphere(20,20);
 	
@@ -105,22 +106,31 @@ void initialise()
 void update (double deltaTime)  
 {
 	running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED);
-	
+	paddle.SetVelocity(vec3(0.0f, 0.0f, 0.0f));
 	if (glfwGetKey(GLFW_KEY_RIGHT) || glfwGetKey('D') )
-		paddle.transform.position.x += paddleSpeed * deltaTime;
+	{
+		paddle.SetVelocity(vec3(paddleSpeed, 0.0f, 0.0f));
+		//paddle.renderObj.transform.position.x += paddleSpeed * deltaTime;
+	}
 	if (glfwGetKey(GLFW_KEY_LEFT) || glfwGetKey('A') )
-		paddle.transform.position.x -= paddleSpeed * deltaTime;
+	{
+		paddle.SetVelocity(vec3(-paddleSpeed, 0.0f, 0.0f));
+		//paddle.renderObj.transform.position.x -= paddleSpeed * deltaTime;
+	}
 	if (glfwGetKey(GLFW_KEY_SPACE) && !ball.GetStatus())
 	{
 		ball.SetStatus(true);
-		ball.StartBall(paddle.transform.position);
+		ball.StartBall(paddle.renderObj.transform.position);
 	}
 
+	paddle.Update(deltaTime);
+
+	// Check paddle limits
 	//if(glm::abs(paddle.transform.position.x) > 4.0f) paddle.transform.position.x = 4.0f; // Fix this to use ABS so the check happens in one line
-	if(paddle.transform.position.x > horizontalLimit) 
-		paddle.transform.position.x = horizontalLimit;
-	else if(paddle.transform.position.x < -horizontalLimit) 
-		paddle.transform.position.x = -horizontalLimit;
+	if(paddle.renderObj.transform.position.x > horizontalLimit) 
+		paddle.renderObj.transform.position.x = horizontalLimit;
+	else if(paddle.renderObj.transform.position.x < -horizontalLimit) 
+		paddle.renderObj.transform.position.x = -horizontalLimit;
 	
 	if(ball.renderObj.transform.position.x > horizontalLimit) 
 		ball.Bounce();
@@ -128,9 +138,9 @@ void update (double deltaTime)
 		ball.Bounce();
 	if(ball.renderObj.transform.position.y > horizontalLimit)
 	{
-		glm::vec3 temp = glm::vec3(ball.GetDirection());
+		glm::vec3 temp = glm::vec3(ball.GetVelocity());
 		temp.y *= -1.0f;
-		ball.SetDirection(temp);
+		ball.SetVelocity(temp);
 	}
 	else if(ball.renderObj.transform.position.y < -horizontalLimit + 1.0f) 
 		ball.ResetBall();
@@ -146,47 +156,55 @@ void update (double deltaTime)
 				&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= b.renderObj.transform.position.x + b.renderObj.transform.scale.x))
 			{
 				// There was a collision with this brick
+				// TODO: Deduct life from brick, change its colour and possibly destroy it?
+				/*
 				b.DeductHealth(1);
 				if(b.GetHealth() == 2)
 					b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
 				else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+				*/
 				// calculate which way to deflect the ball
-				glm::vec3 temp = glm::vec3(ball.GetDirection());
+				glm::vec3 temp = glm::vec3(ball.GetVelocity());
 				if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < b.renderObj.transform.position.x + b.renderObj.transform.scale.x 
 					&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x > b.renderObj.transform.position.x - b.renderObj.transform.scale.y )
 				{					
 					temp.y *= -1.0f;
-					ball.SetDirection(temp);
+					ball.SetVelocity(temp);
 				}
 				else
 				{
 					temp.x *= -1.0f;
-					ball.SetDirection(temp);
+					ball.SetVelocity(temp);
 				}
 				//ball.direction.x *= -1.0f;
 				//ball.Update(deltaTime);
 			}
 		}
-
 	// Check collision with paddle
-	if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= paddle.transform.position.y + paddle.transform.scale.y 
-		&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= paddle.transform.position.y - paddle.transform.scale.y) 
-	&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= paddle.transform.position.x - paddle.transform.scale.x 
-		&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= paddle.transform.position.x + paddle.transform.scale.x))
+	if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= paddle.renderObj.transform.position.y + paddle.renderObj.transform.scale.y 
+		&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= paddle.renderObj.transform.position.y - paddle.renderObj.transform.scale.y) 
+	&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= paddle.renderObj.transform.position.x - paddle.renderObj.transform.scale.x 
+		&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= paddle.renderObj.transform.position.x + paddle.renderObj.transform.scale.x))
 	{
-		glm::vec3 temp = glm::vec3(ball.GetDirection());
-		if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < paddle.transform.position.x + paddle.transform.scale.x 
-			&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x < paddle.transform.position.x - paddle.transform.scale.x)
+		glm::vec3 temp = glm::vec3(ball.GetVelocity());
+		if(abs(paddle.GetVelocity().x) > 0)
+		{
+			ball.SetVelocity(glm::normalize
+			(glm::vec3(ball.GetVelocity() + paddle.GetVelocity())));
+		}
+		if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < paddle.renderObj.transform.position.x + paddle.renderObj.transform.scale.x 
+			&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x < paddle.renderObj.transform.position.x - paddle.renderObj.transform.scale.x)
 		{					
 			temp.x *= -1.0f;
-			ball.SetDirection(temp);
+			ball.SetVelocity(temp);
 		}
 		else
 		{
 			temp.y *= -1.0f;
-			ball.SetDirection(temp);
+			ball.SetVelocity(temp);
 		}
-
+		
+		//ball.SetVelocity(ball.GetVelocity() + (paddle.GetVelocity()));
 		//ball.SetDirection(glm::vec3(ball.GetDirection().y) *= -1.0f);
 		//ball.direction.x *= -1.0f;
 	}
@@ -210,15 +228,15 @@ void render()
 		}
 		glUniform4fv(colourUniform, 1, value_ptr(ball.renderObj.colour));	
 	ball.renderObj.render(view);	// Call render as before
-	glUniform4fv(colourUniform, 1, value_ptr(paddle.colour));	
-	paddle.render(view);	// Call render as before
+	glUniform4fv(colourUniform, 1, value_ptr(paddle.renderObj.colour));	
+	paddle.renderObj.render(view);	// Call render as before
 	glUseProgram(0);		// Tell OpenGL to stop using the program
 	glfwSwapBuffers();
 }
 
 void cleanup()  //Allow us to clean up used resources in our application
 {
-	if (paddle.geometry) delete paddle.geometry;
+	if (paddle.renderObj.geometry) delete paddle.renderObj.geometry;
 	if (program) glDeleteProgram(program);
 	if(shaders[0]) glDeleteShader(shaders[0]);  //Check if objects are created (not equal to 0) then delete accordingly
 	if(shaders[1]) glDeleteShader(shaders[1]);

@@ -7,25 +7,16 @@ Ball::Ball()
 
 Ball::~Ball() { }
 
-void Ball::SetDirection(glm::vec3 dir)
-{
-	direction = dir;
-}
-
-glm::vec3 Ball::GetDirection()
-{
-	return direction;
-}
 
 void Ball::StartBall(glm::vec3 paddlePos)
 {
-	direction = glm::normalize(glm::vec3(renderObj.transform.position - paddlePos));
+	SetVelocity(glm::normalize(glm::vec3(renderObj.transform.position - paddlePos)));
 }
 
 void Ball::ResetBall()
 {
 	renderObj.transform.position = glm::vec3(0.0f, -2.4f, 0.0f);
-	direction = glm::vec3(0.0f, 0.0f, 0.0f);
+	SetVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 	SetStatus(false);
 }
 
@@ -36,7 +27,7 @@ void Ball::Update(float deltaTime)
 
 void Ball::MoveBall(float deltaTime)
 {
-	renderObj.transform.position -= GetDirection() * glm::vec3(speed * deltaTime, speed * deltaTime, 0.0f);
+	renderObj.transform.position += GetVelocity() * glm::vec3(-speed * deltaTime, -speed * deltaTime, 0.0f);
 }
 
 glm::vec3 Ball::RandomDirection()
@@ -51,5 +42,8 @@ glm::vec3 Ball::RandomDirection()
 
 void Ball::Bounce()
 {
-	direction.x *= -1.0f;
+	// TODO: Currently only reverses direction on X-axis
+	glm::vec3 temp = GetVelocity();
+	temp.x *= -1.0f;
+	SetVelocity(temp);
 }
