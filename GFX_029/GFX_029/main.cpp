@@ -76,7 +76,7 @@ void initialise()
 		{
 			Brick b;
 			temp.geometry = geom;
-			temp.transform.position = vec3(-4.0f + (j*1.1f), 3.0f - i*0.8f, 0.0f);
+			temp.transform.position = vec3(-4.0f + (j*1.2f), 3.0f - i*0.8f, 0.0f);
 			temp.transform.scale = vec3(0.6f, 0.30f, 0.0f);
 			temp.colour = vec4(i - 2, i - 1, i + 1 , 1.0f);
 			b.SetRenderObject(temp);
@@ -150,34 +150,41 @@ void update (double deltaTime)
 	for(vector<Brick> r : brick)	// Each line	
 		for(Brick b : r)			// Each individual brick
 		{
-			if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= b.renderObj.transform.position.y + b.renderObj.transform.scale.y 
-				&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= b.renderObj.transform.position.y - b.renderObj.transform.scale.y) 
-			&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= b.renderObj.transform.position.x - b.renderObj.transform.scale.x 
-				&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= b.renderObj.transform.position.x + b.renderObj.transform.scale.x))
+			if(b.GetStatus())
 			{
-				// There was a collision with this brick
-				// TODO: Deduct life from brick, change its colour and possibly destroy it?
-				/*
+				//b.SetStatus(false);
 				b.DeductHealth(1);
-				if(b.GetHealth() == 2)
-					b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
-				else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-				*/
-				// calculate which way to deflect the ball
-				glm::vec3 temp = glm::vec3(ball.GetVelocity());
-				if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < b.renderObj.transform.position.x + b.renderObj.transform.scale.x 
-					&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x > b.renderObj.transform.position.x - b.renderObj.transform.scale.y )
-				{					
-					temp.y *= -1.0f;
-					ball.SetVelocity(temp);
-				}
-				else
+				if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= b.renderObj.transform.position.y + b.renderObj.transform.scale.y 
+					&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= b.renderObj.transform.position.y - b.renderObj.transform.scale.y) 
+				&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= b.renderObj.transform.position.x - (b.renderObj.transform.scale.x * 2.0f) 
+					&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= b.renderObj.transform.position.x + (b.renderObj.transform.scale.x * 2.0f)))
 				{
-					temp.x *= -1.0f;
-					ball.SetVelocity(temp);
+					// There was a collision with this brick
+					// TODO: Deduct life from brick, change its colour and possibly destroy it?
+					/*
+					b.DeductHealth(1);
+					if(b.GetHealth() == 2)
+						b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+					else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+					*/
+					// calculate which way to deflect the ball
+					glm::vec3 temp = glm::vec3(ball.GetVelocity());
+					if((ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < b.renderObj.transform.position.x + (b.renderObj.transform.scale.x) 
+						&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x > b.renderObj.transform.position.x - b.renderObj.transform.scale.x))
+					{					
+						temp.y *= -1.0f;
+						ball.SetVelocity(temp);
+					}
+					else
+					{
+						temp.x *= -1.0f;
+						ball.SetVelocity(temp);
+					}
+					//ball.direction.x *= -1.0f;
+					//ball.Update(deltaTime);
+					break;
 				}
-				//ball.direction.x *= -1.0f;
-				//ball.Update(deltaTime);
+
 			}
 		}
 	// Check collision with paddle
@@ -223,8 +230,11 @@ void render()
 	for(vector<Brick> r : brick)	// Each line	
 		for(Brick b : r)			// Each individual brick
 		{
-			glUniform4fv(colourUniform, 1, value_ptr(b.renderObj.colour));
-			b.renderObj.render(view);
+			if(b.GetStatus())
+			{
+				glUniform4fv(colourUniform, 1, value_ptr(b.renderObj.colour));
+				b.renderObj.render(view);
+			}
 		}
 		glUniform4fv(colourUniform, 1, value_ptr(ball.renderObj.colour));	
 	ball.renderObj.render(view);	// Call render as before

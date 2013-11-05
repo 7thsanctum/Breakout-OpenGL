@@ -9,8 +9,8 @@ glm::vec4 Yellow = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 Brick::Brick()
 { 
 	health = 1;
+	SetStatus(true);
 }
-
 
 Brick::~Brick() { }
 
@@ -40,5 +40,6 @@ void Brick::SetHealth(int health)
 void Brick::DeductHealth(int loss)
 {
 	health -= loss;
+	SetStatus(false);
 	UpdateColour();
 }
