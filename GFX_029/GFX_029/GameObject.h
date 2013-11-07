@@ -17,9 +17,16 @@ public:
 	void SetVelocity(glm::vec3 vel);	
 	void SetStatus(bool status);
 	void SetRenderObject(render_object setObj);
+	glm::vec3 GetPosition();
+	float GetXBound();
+	float GetYBound();
 	~GameObject();
 	render_object renderObj;
 private:
 	bool alive;
 	glm::vec3 velocity;
+	float xBounds;
+	float yBounds;
+
+	void CalculateBounds();
 };

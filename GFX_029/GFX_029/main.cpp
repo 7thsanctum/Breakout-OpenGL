@@ -147,6 +147,7 @@ void update (double deltaTime)
 
 	// TODO: move this collision and bounding box stuff into a better place
 	// Check collisions with bricks
+	bool collision = false;
 	for(vector<Brick> r : brick)	// Each line	
 		for(Brick b : r)			// Each individual brick
 		{
@@ -154,23 +155,23 @@ void update (double deltaTime)
 			{
 				//b.SetStatus(false);
 				b.DeductHealth(1);
-				if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= b.renderObj.transform.position.y + b.renderObj.transform.scale.y 
-					&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= b.renderObj.transform.position.y - b.renderObj.transform.scale.y) 
-				&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= b.renderObj.transform.position.x - (b.renderObj.transform.scale.x * 2.0f) 
-					&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= b.renderObj.transform.position.x + (b.renderObj.transform.scale.x * 2.0f)))
+				if((ball.GetPosition().y - ball.GetYBound() <= b.GetPosition().y + b.GetYBound()
+					&& ball.GetPosition().y + ball.GetYBound() >= b.GetPosition().y - b.GetYBound()) 
+					&& (ball.GetPosition().x + ball.GetXBound() >= b.GetPosition().x - b.GetXBound()
+					&& ball.GetPosition().x - ball.GetXBound() <= b.GetPosition().x + b.GetXBound()))
 				{
 					// There was a collision with this brick
 					// TODO: Deduct life from brick, change its colour and possibly destroy it?
-					/*
-					b.DeductHealth(1);
-					if(b.GetHealth() == 2)
-						b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
-					else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-					*/
+					
+					//b.DeductHealth(1);
+					//if(b.GetHealth() == 2)
+					//	b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+					//else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+					ball.renderObj.transform.position += ball.GetVelocity() * glm::normalize(glm::vec3(ball.GetPosition() - paddle.GetPosition()));
 					// calculate which way to deflect the ball
 					glm::vec3 temp = glm::vec3(ball.GetVelocity());
-					if((ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < b.renderObj.transform.position.x + (b.renderObj.transform.scale.x) 
-						&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x > b.renderObj.transform.position.x - b.renderObj.transform.scale.x))
+					if((ball.GetPosition().x + ball.GetXBound() < b.GetPosition().x + b.GetXBound())
+						&& (ball.GetPosition().x - ball.GetXBound() > b.GetPosition().x- b.GetXBound()))
 					{					
 						temp.y *= -1.0f;
 						ball.SetVelocity(temp);
@@ -180,12 +181,14 @@ void update (double deltaTime)
 						temp.x *= -1.0f;
 						ball.SetVelocity(temp);
 					}
+					
 					//ball.direction.x *= -1.0f;
 					//ball.Update(deltaTime);
-					break;
+					collision = true;	
 				}
-
+				if(collision) break;
 			}
+			if(collision) break;
 		}
 	// Check collision with paddle
 	if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= paddle.renderObj.transform.position.y + paddle.renderObj.transform.scale.y 
