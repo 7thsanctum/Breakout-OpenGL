@@ -48,7 +48,7 @@ void GameObject::SetVelocity(glm::vec3 vel)
 
 void GameObject::SetStatus(bool status)
 {
-	GameObject::alive = status;
+	alive = status;
 }
 
 void GameObject::CalculateBounds()

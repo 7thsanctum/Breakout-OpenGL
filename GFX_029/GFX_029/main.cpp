@@ -148,13 +148,18 @@ void update (double deltaTime)
 	// TODO: move this collision and bounding box stuff into a better place
 	// Check collisions with bricks
 	bool collision = false;
-	for(vector<Brick> r : brick)	// Each line	
+	int i = 0;
+	int j = 0;
+
+	for(vector<Brick> r : brick)	// Each line
+	{
+		i = 0;
 		for(Brick b : r)			// Each individual brick
 		{
 			if(b.GetStatus())
 			{
 				//b.SetStatus(false);
-				b.DeductHealth(1);
+				//b.DeductHealth(1);
 				if((ball.GetPosition().y - ball.GetYBound() <= b.GetPosition().y + b.GetYBound()
 					&& ball.GetPosition().y + ball.GetYBound() >= b.GetPosition().y - b.GetYBound()) 
 					&& (ball.GetPosition().x + ball.GetXBound() >= b.GetPosition().x - b.GetXBound()
@@ -162,13 +167,18 @@ void update (double deltaTime)
 				{
 					// There was a collision with this brick
 					// TODO: Deduct life from brick, change its colour and possibly destroy it?
-					
+					cout << b.alive;
+					brick[j][i].alive = false;
+					b.alive = false;
+					b.SetStatus(false);
+					if(b.alive == false) 
+						cout << "It's dead Jim";
 					//b.DeductHealth(1);
 					//if(b.GetHealth() == 2)
 					//	b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
 					//else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-					ball.renderObj.transform.position += ball.GetVelocity() * glm::normalize(glm::vec3(ball.GetPosition() - paddle.GetPosition()));
-					// calculate which way to deflect the ball
+					//ball.renderObj.transform.position += ball.GetVelocity() * glm::normalize(glm::vec3(ball.GetPosition() - paddle.GetPosition()));
+					// Calculate which way to deflect the ball
 					glm::vec3 temp = glm::vec3(ball.GetVelocity());
 					if((ball.GetPosition().x + ball.GetXBound() < b.GetPosition().x + b.GetXBound())
 						&& (ball.GetPosition().x - ball.GetXBound() > b.GetPosition().x- b.GetXBound()))
@@ -189,7 +199,10 @@ void update (double deltaTime)
 				if(collision) break;
 			}
 			if(collision) break;
+			++i;
 		}
+		++j;
+	}
 	// Check collision with paddle
 	if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= paddle.renderObj.transform.position.y + paddle.renderObj.transform.scale.y 
 		&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= paddle.renderObj.transform.position.y - paddle.renderObj.transform.scale.y) 
@@ -224,12 +237,12 @@ void update (double deltaTime)
 
 void render()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	mat4 view = lookAt(vec3(0.0f, 0.0f, 10.0f),  //Clear screen
-								 vec3(0.0f, 0.0f, 0.0f),
-								 vec3(0.0f, 1.0f, 0.0f));
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear screen
+	mat4 view = lookAt(vec3(0.0f, 0.0f, 10.0f),  
+						vec3(0.0f, 0.0f, 0.0f),
+						vec3(0.0f, 1.0f, 0.0f));
 	glMatrixMode(GL_MODELVIEW);
-	glUseProgram(program);			//Use program we created
+	glUseProgram(program);			// Use program we created
 	for(vector<Brick> r : brick)	// Each line	
 		for(Brick b : r)			// Each individual brick
 		{
@@ -239,7 +252,8 @@ void render()
 				b.renderObj.render(view);
 			}
 		}
-		glUniform4fv(colourUniform, 1, value_ptr(ball.renderObj.colour));	
+
+	glUniform4fv(colourUniform, 1, value_ptr(ball.renderObj.colour));	
 	ball.renderObj.render(view);	// Call render as before
 	glUniform4fv(colourUniform, 1, value_ptr(paddle.renderObj.colour));	
 	paddle.renderObj.render(view);	// Call render as before
@@ -247,11 +261,12 @@ void render()
 	glfwSwapBuffers();
 }
 
-void cleanup()  //Allow us to clean up used resources in our application
+void cleanup()  // Allow us to clean up used resources in our application
 {
+	// Check if objects are created (not equal to 0) then delete accordingly
 	if (paddle.renderObj.geometry) delete paddle.renderObj.geometry;
 	if (program) glDeleteProgram(program);
-	if(shaders[0]) glDeleteShader(shaders[0]);  //Check if objects are created (not equal to 0) then delete accordingly
+	if(shaders[0]) glDeleteShader(shaders[0]);  
 	if(shaders[1]) glDeleteShader(shaders[1]);
 }
 
@@ -262,21 +277,21 @@ int main()
 
 	if (!glfwOpenWindow(800, 600, 0, 0, 0, 0, 0, 0, GLFW_WINDOW))  //Setting window size
 	{
-		glfwTerminate();  //If can open window this size Terminate GLFW
-		exit(EXIT_FAILURE);  //And exit
+		glfwTerminate();		// If can open window this size Terminate GLFW
+		exit(EXIT_FAILURE);		// And exit
 	}
 
 	GLenum error = glewInit();
-	if (error != GLEW_OK)  //Check for errors in glewInit
+	if (error != GLEW_OK)  // Check for errors in glewInit
 	{
 		std::cout<< "Error: " << glewGetErrorString(error) << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	initialise();  //Intialiase everything so far then enter main render loop
+	initialise();  // Intialiase everything so far then enter main render loop
 
 	double prevTimeStamp = glfwGetTime();
-	double currentTimeStamp;	//Place to store the current time
+	double currentTimeStamp;	// Place to store the current time
 	while (running)				// The Loop
 	{
 		currentTimeStamp = glfwGetTime();			// Store the current time in "currentTimeStamp"

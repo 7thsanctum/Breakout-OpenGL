@@ -22,8 +22,9 @@ public:
 	float GetYBound();
 	~GameObject();
 	render_object renderObj;
-private:
 	bool alive;
+private:
+	
 	glm::vec3 velocity;
 	float xBounds;
 	float yBounds;
