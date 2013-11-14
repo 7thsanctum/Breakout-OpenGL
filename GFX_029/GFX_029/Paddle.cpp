@@ -1,6 +1,9 @@
 #include "Paddle.h"
 
-Paddle::Paddle() { }
+Paddle::Paddle() 
+{
+	SetStatus(true);
+}
 Paddle::~Paddle() { }
 
 void Paddle::Update(float deltaTime)

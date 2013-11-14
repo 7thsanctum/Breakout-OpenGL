@@ -16,6 +16,29 @@ void GameObject::SetRenderObject(render_object setObj)
 	CalculateBounds();
 }
 
+// Change object colour to whatever is defined
+void GameObject::ChangeColour(glm::vec4 newColour)
+{	
+	renderObj.colour = newColour;
+}
+
+void GameObject::RandomColour()
+{	
+	// Create a random engine
+	auto millis = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	default_random_engine e(millis.count());
+	uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+
+	float r = distribution(e);
+	float g = distribution(e);
+	float b = distribution(e);
+	// TODO: add check to make sure it doesn't go black, 
+	// possibly add a list of colours and instead select a random colour?
+
+	renderObj.colour = glm::vec4(r, g, b, 1.0f);
+}
+
+// Return the objects current position
 glm::vec3 GameObject::GetPosition()
 {
 	return renderObj.transform.position;
@@ -33,7 +56,7 @@ float GameObject::GetYBound()
 
 bool GameObject::GetStatus()
 {
-	return GameObject::alive;
+	return alive;
 }
 
 glm::vec3 GameObject::GetVelocity()
@@ -53,6 +76,6 @@ void GameObject::SetStatus(bool status)
 
 void GameObject::CalculateBounds()
 {
-	xBounds = (renderObj.transform.scale.x * 2.0f);
+	xBounds = (renderObj.transform.scale.x);
 	yBounds = (renderObj.transform.scale.y);
 }

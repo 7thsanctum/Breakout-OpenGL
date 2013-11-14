@@ -1,9 +1,4 @@
 #include "GameObject.h"
-#include <random>
-#include <chrono>
-
-using namespace std;
-using namespace std::chrono;
 
 class Ball: public GameObject 
 {

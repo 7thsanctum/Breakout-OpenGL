@@ -18,10 +18,8 @@
 #include "geometry.h"
 #include "shader.h"
 
-#include "GameObject.h"
-#include "Paddle.h"
-#include "Ball.h"
-#include "Brick.h"
+#include "Game.h"
+
 
 using namespace std;
 using namespace glm;
@@ -30,14 +28,7 @@ GLuint shaders[2];  // Declare 2 shaders
 GLuint program;		// Declare one program paddle
 GLint colourUniform;
 
-vector< vector<Brick> > brick;
-Ball ball;				// Declare render_object for geometry
-Paddle paddle;	// Declare render_object for geometry
-
-float horizontalLimit = 5.0f;
-float paddleSpeed = 8.0f;
-int rows = 4;
-int columns = 8;
+Game breakout = Game();;
 
 bool running = true;
 
@@ -66,197 +57,29 @@ void initialise()
 		exit(EXIT_FAILURE);
 
 	colourUniform = glGetUniformLocation(program, "colour");
-	geometry* geom = createQuad();			// Create a quad to add to all the objects in the scene
-	render_object temp;	
-
-	for(int i = 0; i < rows; ++i)	// Each line
-	{
-		vector<Brick> tempB;
-		for(int j = 0; j < columns; ++j)			// Each individual brick
-		{
-			Brick b;
-			temp.geometry = geom;
-			temp.transform.position = vec3(-4.0f + (j*1.2f), 3.0f - i*0.8f, 0.0f);
-			temp.transform.scale = vec3(0.6f, 0.30f, 0.0f);
-			temp.colour = vec4(i - 2, i - 1, i + 1 , 1.0f);
-			b.SetRenderObject(temp);
-			if(i % 2 == 0) b.SetHealth(1);
-			else b.SetHealth(2);
-			b.UpdateColour();
-			tempB.push_back(b);
-		}
-		brick.push_back(tempB);
-	}
-
-	paddle.renderObj.geometry = geom;
-	paddle.renderObj.transform.position -= vec3(0.0f, 3.0f, 0.0f);
-	paddle.renderObj.transform.scale.y = 0.1f;
-	paddle.renderObj.transform.scale.x = 1.0f;
-	paddle.renderObj.colour = vec4(0.0f, 1.0f, 0.0f, 1.0f);  // Set colour 
-
-	geom = createSphere(20,20);
-	
-	temp.geometry = geom;
-	temp.transform.scale = vec3(0.1f, 0.1f, 0.1f);
-	temp.transform.position -= vec3(0.0f, 2.5f, 0.0f);
-	temp.colour = vec4(1.0f, 1.0f, 0.4f, 1.0f);  // Set colour 
-	ball.SetRenderObject(temp);
 }
 
 void update (double deltaTime)  
 {
-	running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED);
-	paddle.SetVelocity(vec3(0.0f, 0.0f, 0.0f));
-	if (glfwGetKey(GLFW_KEY_RIGHT) || glfwGetKey('D') )
-	{
-		paddle.SetVelocity(vec3(paddleSpeed, 0.0f, 0.0f));
-		//paddle.renderObj.transform.position.x += paddleSpeed * deltaTime;
-	}
-	if (glfwGetKey(GLFW_KEY_LEFT) || glfwGetKey('A') )
-	{
-		paddle.SetVelocity(vec3(-paddleSpeed, 0.0f, 0.0f));
-		//paddle.renderObj.transform.position.x -= paddleSpeed * deltaTime;
-	}
-	if (glfwGetKey(GLFW_KEY_SPACE) && !ball.GetStatus())
-	{
-		ball.SetStatus(true);
-		ball.StartBall(paddle.renderObj.transform.position);
-	}
-
-	paddle.Update(deltaTime);
-
-	// Check paddle limits
-	//if(glm::abs(paddle.transform.position.x) > 4.0f) paddle.transform.position.x = 4.0f; // Fix this to use ABS so the check happens in one line
-	if(paddle.renderObj.transform.position.x > horizontalLimit) 
-		paddle.renderObj.transform.position.x = horizontalLimit;
-	else if(paddle.renderObj.transform.position.x < -horizontalLimit) 
-		paddle.renderObj.transform.position.x = -horizontalLimit;
-	
-	if(ball.renderObj.transform.position.x > horizontalLimit) 
-		ball.Bounce();
-	else if(ball.renderObj.transform.position.x < -horizontalLimit) 
-		ball.Bounce();
-	if(ball.renderObj.transform.position.y > horizontalLimit)
-	{
-		glm::vec3 temp = glm::vec3(ball.GetVelocity());
-		temp.y *= -1.0f;
-		ball.SetVelocity(temp);
-	}
-	else if(ball.renderObj.transform.position.y < -horizontalLimit + 1.0f) 
-		ball.ResetBall();
-
-	// TODO: move this collision and bounding box stuff into a better place
-	// Check collisions with bricks
-	bool collision = false;
-	int i = 0;
-	int j = 0;
-
-	for(vector<Brick> r : brick)	// Each line
-	{
-		i = 0;
-		for(Brick b : r)			// Each individual brick
-		{
-			if(b.GetStatus())
-			{
-				//b.SetStatus(false);
-				//b.DeductHealth(1);
-				if((ball.GetPosition().y - ball.GetYBound() <= b.GetPosition().y + b.GetYBound()
-					&& ball.GetPosition().y + ball.GetYBound() >= b.GetPosition().y - b.GetYBound()) 
-					&& (ball.GetPosition().x + ball.GetXBound() >= b.GetPosition().x - b.GetXBound()
-					&& ball.GetPosition().x - ball.GetXBound() <= b.GetPosition().x + b.GetXBound()))
-				{
-					// There was a collision with this brick
-					// TODO: Deduct life from brick, change its colour and possibly destroy it?
-					cout << b.alive;
-					brick[j][i].alive = false;
-					b.alive = false;
-					b.SetStatus(false);
-					if(b.alive == false) 
-						cout << "It's dead Jim";
-					//b.DeductHealth(1);
-					//if(b.GetHealth() == 2)
-					//	b.renderObj.colour = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
-					//else b.renderObj.colour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-					//ball.renderObj.transform.position += ball.GetVelocity() * glm::normalize(glm::vec3(ball.GetPosition() - paddle.GetPosition()));
-					// Calculate which way to deflect the ball
-					glm::vec3 temp = glm::vec3(ball.GetVelocity());
-					if((ball.GetPosition().x + ball.GetXBound() < b.GetPosition().x + b.GetXBound())
-						&& (ball.GetPosition().x - ball.GetXBound() > b.GetPosition().x- b.GetXBound()))
-					{					
-						temp.y *= -1.0f;
-						ball.SetVelocity(temp);
-					}
-					else
-					{
-						temp.x *= -1.0f;
-						ball.SetVelocity(temp);
-					}
-					
-					//ball.direction.x *= -1.0f;
-					//ball.Update(deltaTime);
-					collision = true;	
-				}
-				if(collision) break;
-			}
-			if(collision) break;
-			++i;
-		}
-		++j;
-	}
-	// Check collision with paddle
-	if((ball.renderObj.transform.position.y - ball.renderObj.transform.scale.y <= paddle.renderObj.transform.position.y + paddle.renderObj.transform.scale.y 
-		&& ball.renderObj.transform.position.y + ball.renderObj.transform.scale.y >= paddle.renderObj.transform.position.y - paddle.renderObj.transform.scale.y) 
-	&& (ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x >= paddle.renderObj.transform.position.x - paddle.renderObj.transform.scale.x 
-		&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x <= paddle.renderObj.transform.position.x + paddle.renderObj.transform.scale.x))
-	{
-		glm::vec3 temp = glm::vec3(ball.GetVelocity());
-		if(abs(paddle.GetVelocity().x) > 0)
-		{
-			ball.SetVelocity(glm::normalize
-			(glm::vec3(ball.GetVelocity() + paddle.GetVelocity())));
-		}
-		if(ball.renderObj.transform.position.x + ball.renderObj.transform.scale.x < paddle.renderObj.transform.position.x + paddle.renderObj.transform.scale.x 
-			&& ball.renderObj.transform.position.x - ball.renderObj.transform.scale.x < paddle.renderObj.transform.position.x - paddle.renderObj.transform.scale.x)
-		{					
-			temp.x *= -1.0f;
-			ball.SetVelocity(temp);
-		}
-		else
-		{
-			temp.y *= -1.0f;
-			ball.SetVelocity(temp);
-		}
-		
-		//ball.SetVelocity(ball.GetVelocity() + (paddle.GetVelocity()));
-		//ball.SetDirection(glm::vec3(ball.GetDirection().y) *= -1.0f);
-		//ball.direction.x *= -1.0f;
-	}
-
-	ball.Update(deltaTime);
+	running = breakout.Update(deltaTime);
 }
 
 void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear screen
-	mat4 view = lookAt(vec3(0.0f, 0.0f, 10.0f),  
-						vec3(0.0f, 0.0f, 0.0f),
-						vec3(0.0f, 1.0f, 0.0f));
+	// TODO: set this up so it is inside the game class 
+	// and can be changed dependent on the size of the game
+	mat4 view = lookAt(vec3(0.0f, 0.0f, 30.0f),		// Cameras position
+						vec3(0.0f, 0.0f, 0.0f),	
+						vec3(0.0f, 1.0f, 0.0f));	// Camers up vector
 	glMatrixMode(GL_MODELVIEW);
 	glUseProgram(program);			// Use program we created
-	for(vector<Brick> r : brick)	// Each line	
-		for(Brick b : r)			// Each individual brick
-		{
-			if(b.GetStatus())
-			{
-				glUniform4fv(colourUniform, 1, value_ptr(b.renderObj.colour));
-				b.renderObj.render(view);
-			}
-		}
+	for(GameObject obj : breakout.GetActiveObjectsInScene())
+	{
+		glUniform4fv(colourUniform, 1, value_ptr(obj.renderObj.colour));
+		obj.renderObj.render(view);
+	}
 
-	glUniform4fv(colourUniform, 1, value_ptr(ball.renderObj.colour));	
-	ball.renderObj.render(view);	// Call render as before
-	glUniform4fv(colourUniform, 1, value_ptr(paddle.renderObj.colour));	
-	paddle.renderObj.render(view);	// Call render as before
 	glUseProgram(0);		// Tell OpenGL to stop using the program
 	glfwSwapBuffers();
 }
@@ -264,7 +87,8 @@ void render()
 void cleanup()  // Allow us to clean up used resources in our application
 {
 	// Check if objects are created (not equal to 0) then delete accordingly
-	if (paddle.renderObj.geometry) delete paddle.renderObj.geometry;
+	//if (paddle.renderObj.geometry) delete paddle.renderObj.geometry;
+	breakout.~Game();
 	if (program) glDeleteProgram(program);
 	if(shaders[0]) glDeleteShader(shaders[0]);  
 	if(shaders[1]) glDeleteShader(shaders[1]);

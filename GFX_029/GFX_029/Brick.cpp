@@ -22,15 +22,9 @@ int Brick::GetHealth()
 void Brick::UpdateColour()
 {
 	if(health == 2)
-		renderObj.colour = Orange;
-	else renderObj.colour = Yellow;
+		ChangeColour(Orange);
+	else ChangeColour(Yellow);
 }
-
-void Brick::ChangeColour(glm::vec4 newColour)
-{	
-	renderObj.colour = newColour;
-}
-
 
 void Brick::SetHealth(int health)
 {
@@ -40,6 +34,6 @@ void Brick::SetHealth(int health)
 void Brick::DeductHealth(int loss)
 {
 	health -= loss;
-	SetStatus(false);
+	if(health == 0) SetStatus(false);
 	UpdateColour();
 }

@@ -15,7 +15,7 @@ void Ball::StartBall(glm::vec3 paddlePos)
 
 void Ball::ResetBall()
 {
-	renderObj.transform.position = glm::vec3(0.0f, -2.4f, 0.0f);
+	renderObj.transform.position = glm::vec3(0.0f, -6.4f, 0.0f);
 	SetVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 	SetStatus(false);
 }
