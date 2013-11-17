@@ -28,7 +28,7 @@ void Game::Initialise()
 	geometry* geom = createQuad();			// Create a quad to add to all the objects in the scene
 	render_object temp;	
 
-	ifstream fin("map.csv", ifstream::in);
+	ifstream fin("map1.csv", ifstream::in);
     char singleCharacter;
     //Get a character from the input file
     fin.get(singleCharacter);
