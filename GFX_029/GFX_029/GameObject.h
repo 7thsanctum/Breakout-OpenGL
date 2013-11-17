@@ -8,6 +8,7 @@
 #include <chrono>
 
 #include "geometry.h"
+#include "Utilities.h"
 
 using namespace std;
 using namespace std::chrono;

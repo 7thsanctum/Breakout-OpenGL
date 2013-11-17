@@ -21,14 +21,18 @@ int Brick::GetHealth()
 
 void Brick::UpdateColour()
 {
-	if(health == 2)
-		ChangeColour(Orange);
-	else ChangeColour(Yellow);
+	if(health == 0) ChangeColour(Colors::Black);
+	else if(health > 4) ChangeColour(Colors::Red);
+	else if(health == 4) ChangeColour(Colors::Blue);
+	else if(health == 3) ChangeColour(Colors::LightSteelBlue);
+	else if(health == 2) ChangeColour(Colors::Orange);
+	else if(health == 1) ChangeColour(Colors::Yellow);
 }
 
 void Brick::SetHealth(int health)
 {
 	Brick::health = health;
+	UpdateColour();
 }
 
 void Brick::DeductHealth(int loss)

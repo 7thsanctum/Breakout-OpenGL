@@ -7,9 +7,9 @@ vector< vector<Brick> > brick;
 Ball ball;				// Declare render_object for geometry
 Paddle paddle;			// Declare render_object for geometry
 
-float hLimit = 18.0f;
-float vLimit = 12.0f;
-float paddleSpeed = 8.0f;
+float hLimit = 16.0f;
+float vLimit = 14.0f;
+float paddleSpeed = 12.0f;
 int rows = 20;
 int columns = 26;
 int offset = 0;

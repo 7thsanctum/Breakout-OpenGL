@@ -27,7 +27,14 @@ void GameObject::RandomColour()
 	// Create a random engine
 	auto millis = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	default_random_engine e(millis.count());
-	uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	uniform_int_distribution<int> distribution(0, 11);
+	glm::vec4 col = Colors::colorList[distribution(e)];
+
+	if(col == Colors::Black) col = Colors::Blue;	// TODO: Randomly generate again
+
+	renderObj.colour = col;
+
+	/*uniform_real_distribution<float> distribution(-1.0f, 1.0f);
 
 	float r = distribution(e);
 	float g = distribution(e);
@@ -35,7 +42,8 @@ void GameObject::RandomColour()
 	// TODO: add check to make sure it doesn't go black, 
 	// possibly add a list of colours and instead select a random colour?
 
-	renderObj.colour = glm::vec4(r, g, b, 1.0f);
+
+	renderObj.colour = glm::vec4(r, g, b, 1.0f);*/
 }
 
 // Return the objects current position

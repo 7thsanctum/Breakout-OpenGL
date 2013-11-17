@@ -1,5 +1,5 @@
 #include "GameObject.h"
-
+#include "Utilities.h"
 class Brick: public GameObject
 {
 public:

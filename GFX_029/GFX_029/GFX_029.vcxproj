@@ -95,6 +95,7 @@
     <ClInclude Include="geometry.h" />
     <ClInclude Include="Paddle.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="colour.frag" />
