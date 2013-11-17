@@ -6,6 +6,7 @@
 
 #include <GL\glew.h>
 #include <GL\glfw.h>
+#include <IL\ilut.h>
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_precision.hpp>
@@ -15,6 +16,7 @@
 #include <vector>
 #include <random>
 #include <iostream>
+#include <conio.h>
 #include "geometry.h"
 #include "shader.h"
 
@@ -32,12 +34,15 @@ Game breakout = Game();;
 
 bool running = true;
 
+int resX = 800; 
+int resY = 600;
+
 void initialise()
 {
 	// TODO: add in resolution selection code from other project
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	mat4 projection = perspective(degrees(quarter_pi<float>()), 
-		                                                 800.0f/600.0f, 
+		                                                 (float)resX/(float)resY, 
 		                                                 0.1f, 
 		                                                 10000.0f);
 	glMatrixMode(GL_PROJECTION);
@@ -94,13 +99,57 @@ void cleanup()  // Allow us to clean up used resources in our application
 	if(shaders[1]) glDeleteShader(shaders[1]);
 }
 
+bool resolutionSelect()	//Sets the resolution of the application
+{
+	int val = 0;
+	char SELEC; 
+
+	GLFWvidmode return_struct;				
+
+	glfwGetDesktopMode( &return_struct );	// Gets the current desktop resolution
+
+	int width = return_struct.Width;
+	int height = return_struct.Height;
+	resX = width;
+	resY = height;
+	do{
+		system("CLS");
+		std::cout << "Please select your resolution\n1) 800x600\n2) 1024x768\n3) 1280x720\n4) 1920x1080\n5) Native : " << width << "x" << height;	
+		std::cout << "\n\nYour native resolution is " << width << "x" << height << " and has been set as the default\n";
+		std::cout<<"\nPlease press either 1,2,3,4 or 5.\n";
+		SELEC = _getche(); //Takes in the users choice instantly without having to press enter
+    }while (SELEC < '1' || SELEC > '5');
+
+	val = SELEC - '0';	//Converts from ASCII to the actual value
+	if(val == 1) { resX = 800; resY = 600; }
+	else if(val == 2) { resX = 1024; resY = 768; }
+	else if(val == 3) { resX = 1280; resY = 720; }
+	else if(val == 4) { resX = 1920; resY = 1080; }
+	else if(val == 5) { }
+	else return(false); 
+
+	system("CLS");	//Clear screen so it isn't too crowded
+
+	return(true);	
+}
+
 int main()
 {
+	int mode = GLFW_WINDOW;
 	if(!glfwInit())  //initialise GLFW by calling gltwInit
 		exit(EXIT_FAILURE);  //If cant find it then close window
 
-	if (!glfwOpenWindow(800, 600, 0, 0, 0, 0, 0, 0, GLFW_WINDOW))  //Setting window size
-	{
+	int check = MessageBox(NULL,L"Welcome! \nWould you like to run this application in full screen mode?", L"Welcome to Mark's Program!",MB_YESNO|MB_ICONINFORMATION);
+	if(check == IDYES)		mode = GLFW_FULLSCREEN;		 // Set to fullscreen mode
+	else if (check == IDNO) std::cout << "OK, your loss ...\n"; 
+	//ShowCursor(FALSE);
+
+	//glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 8);	//Anti Aliasing effect only seems to work at 16
+
+	if(!resolutionSelect())	//Select resolution
+		std::cout << "\nResolution selection failed, you have been set to the default resolution\n";
+	if (!glfwOpenWindow(int(resX), int(resY), 0, 0, 0, 0, 0, 0, mode))  //Setting window size
+	{		
 		glfwTerminate();		// If can open window this size Terminate GLFW
 		exit(EXIT_FAILURE);		// And exit
 	}
