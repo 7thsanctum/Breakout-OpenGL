@@ -7,12 +7,14 @@ vector< vector<Brick> > brick;
 Ball ball;				// Declare render_object for geometry
 Paddle paddle;			// Declare render_object for geometry
 
-float hLimit = 14.0f;
+float hLimit = 18.0f;
 float vLimit = 12.0f;
 float paddleSpeed = 8.0f;
-int rows = 10;
+int rows = 20;
 int columns = 26;
 int offset = 0;
+
+vector<vector<int>> grid(1);
 
 Game::Game() 
 {
@@ -26,6 +28,32 @@ void Game::Initialise()
 	geometry* geom = createQuad();			// Create a quad to add to all the objects in the scene
 	render_object temp;	
 
+	ifstream fin("map.csv", ifstream::in);
+    char singleCharacter;
+    //Get a character from the input file
+    fin.get(singleCharacter);
+
+	int row = 0;
+	int column = 0;
+
+	while (fin.good())
+    {
+		if(singleCharacter - '0' >= 0 && singleCharacter - '0' < 10)
+		{
+			grid[row].push_back(singleCharacter - '0');
+			++column;
+			if(column >= columns)
+			{
+				++row;
+				vector<int> temp(0);
+				grid.push_back(temp);
+				column = 0;
+			}
+		}
+        //std::cout << singleCharacter;
+        fin.get(singleCharacter);
+    }
+
 	for(int i = 0; i < rows; ++i)			// Each row of bricks
 	{
 		vector<Brick> tempB;				// Place holder so we can push rows back
@@ -33,12 +61,13 @@ void Game::Initialise()
 		{
 			Brick b;
 			temp.geometry = geom;
-			temp.transform.position = vec3(-15.0f + (j*1.2f), 3.0f - i*0.8f, 0.0f);
+			temp.transform.position = vec3(-15.0f + (j*1.2f), 10.0f - i*0.8f, 0.0f);
 			temp.transform.scale = vec3(0.6f, 0.30f, 0.0f);
 			temp.colour = vec4(i - 2, i - 1, i + 1 , 1.0f);
 			b.SetRenderObject(temp);
-			if(i % 2 == 0) b.SetHealth(1);
-			else b.SetHealth(2);
+			b.SetHealth(grid[i][j]);
+			//if(i % 2 == 0) b.SetHealth(1);
+			//else b.SetHealth(2);
 			b.UpdateColour();
 			tempB.push_back(b);
 		}
