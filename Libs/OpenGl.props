@@ -3,11 +3,15 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Users\10006179\Desktop\Libraries\glut-3.7\include;C:\Users\10006179\Desktop\Libraries\SDL-1.2.15\include;C:\Users\10006179\Desktop\Libraries\DevIL-SDK-x86-1.7.8\include;C:\Users\10006179\Desktop\Libraries\boost_1_51;C:\Users\10006179\Desktop\Libraries\glew-1.9.0\include;C:\Users\10006179\Desktop\Libraries\glm-0.9.3.4;C:\Users\10006179\Desktop\Libraries\glfw-2.7.6.bin.WIN32\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Library\Legacy Libs\Libraries\glut-3.7\include;D:\Library\Legacy Libs\Libraries\SDL-1.2.15\include;D:\Library\Legacy Libs\Libraries\DevIL-SDK-x86-1.7.8\include;D:\Library\Legacy Libs\Libraries\boost_1_51;D:\Library\Legacy Libs\Libraries\glew-1.9.0\include;D:\Library\Legacy Libs\Libraries\glm-0.9.3.4;D:\Library\Legacy Libs\Libraries\glfw-2.7.6.bin.WIN32\include;D:\Library\Legacy Libs\Libraries\Box2D_v2.3.0\Box2D;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup>
-    <LibraryPath>C:\Users\10006179\Desktop\Libraries\glut-3.7\lib;C:\Users\10006179\Desktop\Libraries\SDL-1.2.15\lib\x86;C:\Users\Mark\Documents\Libraries\DevIL-SDK-x86-1.7.8\lib;C:\Users\Mark\Documents\Libraries\boost_1_51\libs;C:\Users\10006179\Desktop\Libraries\glew-1.9.0\lib;C:\Users\10006179\Desktop\Libraries\glfw-2.7.6.bin.WIN32\lib-msvc100;$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\Library\Legacy Libs\Libraries\glut-3.7\lib;D:\Library\Legacy Libs\Libraries\SDL-1.2.15\lib\x86;D:\Library\Legacy Libs\Libraries\DevIL-SDK-x86-1.7.8\lib;D:\Library\Legacy Libs\Libraries\boost_1_51\libs;D:\Library\Legacy Libs\Libraries\glew-1.9.0\lib;D:\Library\Legacy Libs\Libraries\glfw-2.7.6.bin.WIN32\lib-msvc100;D:\Library\Legacy Libs\Libraries\Box2D_v2.3.0\Box2D\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>Box2D.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

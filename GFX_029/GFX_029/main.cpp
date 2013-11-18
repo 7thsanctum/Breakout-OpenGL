@@ -17,6 +17,8 @@
 #include <random>
 #include <iostream>
 #include <conio.h>
+#include <Box2D/Box2D.h>
+
 #include "geometry.h"
 #include "shader.h"
 
@@ -152,7 +154,7 @@ int main()
 		glfwTerminate();		// If can open window this size Terminate GLFW
 		exit(EXIT_FAILURE);		// And exit
 	}
-
+	
 	GLenum error = glewInit();
 	if (error != GLEW_OK)  // Check for errors in glewInit
 	{
