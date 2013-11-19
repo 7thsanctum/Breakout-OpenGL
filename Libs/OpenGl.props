@@ -3,10 +3,10 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>D:\Library\Legacy Libs\Libraries\glut-3.7\include;D:\Library\Legacy Libs\Libraries\SDL-1.2.15\include;D:\Library\Legacy Libs\Libraries\DevIL-SDK-x86-1.7.8\include;D:\Library\Legacy Libs\Libraries\boost_1_51;D:\Library\Legacy Libs\Libraries\glew-1.9.0\include;D:\Library\Legacy Libs\Libraries\glm-0.9.3.4;D:\Library\Legacy Libs\Libraries\glfw-2.7.6.bin.WIN32\include;D:\Library\Legacy Libs\Libraries\Box2D_v2.3.0\Box2D;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\10006179\Desktop\Libraries\glut-3.7\include;C:\Users\10006179\Desktop\Libraries\SDL-1.2.15\include;C:\Users\10006179\Desktop\Libraries\DevIL-SDK-x86-1.7.8\include;C:\Users\10006179\Desktop\Libraries\boost_1_51;C:\Users\10006179\Desktop\Libraries\glew-1.9.0\include;C:\Users\10006179\Desktop\Libraries\glm-0.9.3.4;C:\Users\10006179\Desktop\Libraries\glfw-2.7.6.bin.WIN32\include;C:\Users\10006179\Desktop\Libraries\Box2D_v2.3.0\Box2D;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup>
-    <LibraryPath>D:\Library\Legacy Libs\Libraries\glut-3.7\lib;D:\Library\Legacy Libs\Libraries\SDL-1.2.15\lib\x86;D:\Library\Legacy Libs\Libraries\DevIL-SDK-x86-1.7.8\lib;D:\Library\Legacy Libs\Libraries\boost_1_51\libs;D:\Library\Legacy Libs\Libraries\glew-1.9.0\lib;D:\Library\Legacy Libs\Libraries\glfw-2.7.6.bin.WIN32\lib-msvc100;D:\Library\Legacy Libs\Libraries\Box2D_v2.3.0\Box2D\Lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\10006179\Desktop\Libraries\glut-3.7\lib;C:\Users\10006179\Desktop\Libraries\SDL-1.2.15\lib\x86;C:\Users\10006179\Desktop\Libraries\DevIL-SDK-x86-1.7.8\lib;C:\Users\10006179\Desktop\Libraries\boost_1_51\libs;C:\Users\10006179\Desktop\Libraries\glew-1.9.0\lib;C:\Users\10006179\Desktop\Libraries\glfw-2.7.6.bin.WIN32\lib-msvc100;C:\Users\10006179\Desktop\Libraries\Box2D_v2.3.0\Box2D\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
