@@ -106,6 +106,18 @@ bool Game::Update(float deltaTime)
 {
 	bool running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED);
 	paddle.SetVelocity(vec3(0.0f, 0.0f, 0.0f));
+
+	if (glfwGetKey(GLFW_KEY_UP))
+	{
+		ball.SetSpeed(ball.GetSpeed() + (1.0f * deltaTime));
+		//paddle.renderObj.transform.position.x += paddleSpeed * deltaTime;
+	}
+	if (glfwGetKey(GLFW_KEY_DOWN))
+	{
+		ball.SetSpeed(ball.GetSpeed() - (1.0f * deltaTime));
+		//paddle.renderObj.transform.position.x -= paddleSpeed * deltaTime;
+	}
+
 	if (glfwGetKey(GLFW_KEY_RIGHT) || glfwGetKey('D') )
 	{
 		paddle.SetVelocity(vec3(paddleSpeed, 0.0f, 0.0f));

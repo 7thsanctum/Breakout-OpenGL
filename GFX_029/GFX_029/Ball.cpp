@@ -47,3 +47,13 @@ void Ball::Bounce()
 	temp.x *= -1.0f;
 	SetVelocity(temp);
 }
+
+float Ball::GetSpeed()
+{
+	return speed;
+}
+
+void Ball::SetSpeed(float value)
+{
+	speed = value;
+}

@@ -13,6 +13,8 @@ public:
 	void Bounce();
 	glm::vec3 RandomDirection();
 	void checkCollision();
+	float GetSpeed();
+	void SetSpeed(float value);
 private:
 	float speed;
 };
